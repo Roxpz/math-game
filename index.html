@@ -1,0 +1,1677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="fontawesome-free-6.7.2-web/css/all.min.css">
+  <title>Math Game</title>
+  <style>
+/* Global Styles */
+html {
+  font-size: 12px;
+}
+*, *::before, *::after {
+  line-height: 1.2;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body, button {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Layout Container */
+#page-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 30px;
+  padding: 10px;
+}
+
+/* Closet Section */
+.closet {
+  width: 350px;
+  height: 90vh;
+  background: linear-gradient(to bottom, #f5f5f5, #ddd);
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.2);
+  overflow-y: hidden;  /* Hide overflowing images */
+  position: relative;  /* For positioning the view-all button */
+}
+.closet h2 {
+  font-size: 1em;
+  text-align: center;
+  margin: 5px 0;
+}
+.closet-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 5px;
+}
+.closet-item {
+  width: 100%;
+  height: 80px;
+  border: 1px solid #ddd;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #fff;
+}
+.closet-item img {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* Newly-Unlocked Gift Highlight with Golden Glow */
+.closet-item.newly-unlocked {
+  border: 2px solid gold;
+  box-shadow: 0 0 10px 3px gold;
+  animation: highlight 2s;
+}
+@keyframes highlight {
+  0% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+/* "View All Gifts" Button Positioned at the Bottom */
+.view-all-btn {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  padding: 10px;
+  background: linear-gradient(135deg, #6fd1b7, #a0e8cf);
+  color: #fff;
+  border: none;
+  border-radius: 9999px;
+  cursor: pointer;
+  font-size: 1em;
+}
+
+/* Center & Game Container */
+#center-container {
+  flex: 1;
+  max-width: 500px;
+  position: relative;
+}
+#math-app {
+  background-color: white;
+  padding: 0; 
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  min-height: 90vh;
+  position: relative;
+}
+
+/* Header & Stats */
+#header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+}
+#header-left {
+  display: flex;
+  align-items: center;
+}
+#header-left h1 {
+  margin-left: 2px;
+  color: blue;
+  font-size: 1.5em;
+}
+#lives {
+  font-size: 1.5em;
+}
+#stats-row {
+  display: flex;
+  justify-content: right;
+  gap: 20px;
+  padding: 4px 8px;
+  font-size: 1.2em;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Settings & Emoji */
+#settings-btn {
+  height: 3.5rem;
+  width: 3.5rem;
+  background: transparent;
+  border: 2px solid #ccc;
+  border-radius: 9999px;
+  cursor: pointer;
+  font-size: 2em;
+  line-height: 1;
+  padding: 1px;
+}
+.emoji-option {
+  font-size: 1.5em;
+  margin: 3px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  padding: 3px;
+  border-radius: 5px;
+  transition: border 0.2s;
+}
+
+/* Progress Bar & Gift Count */
+#progress-wrapper {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0;
+  padding: 8px;
+  margin-bottom: 30px;
+}
+#progress-container {
+  flex: 1;
+  height: 8px;
+  margin: 0 auto;
+  background-color: #ddd;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+#progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(135deg, #6fd1b7 0%, #a0e8cf 100%);
+  transition: width 0.3s ease;
+}
+#gift-count {
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+/* Problem & Options */
+#problem {
+  font-size: 2.5em;
+  margin: 8px;
+  text-align: center;
+}
+#options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin: 8px;
+}
+.option {
+  padding: 12px;
+  font-size: 2em;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.3s;
+  border-radius: 8px;
+  border: 2px solid #ddd;
+  background-color: #e0e0e0;
+  text-align: center;
+}
+.option:hover {
+  transform: scale(1.05);
+}
+
+/* Timer */
+#timer {
+  width: 90%;
+  height: 16px;
+  background-color: #ccc;
+  margin: 8px auto;
+  border-radius: 10px;
+  overflow: hidden;
+}
+#timer-bar {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to right, #ff0000, #ff6600);
+  transition: width 0.1s linear;
+}
+#timer-text {
+  margin-bottom: 30px;
+  font-size: 1.2em;
+  text-align: center;
+  font-weight: bold;
+}
+
+/* Next Button */
+#next-btn {
+  width: 90%;
+  display: block;
+  padding: 15px 20px;
+  font-size: 1.2em;
+  background-image: linear-gradient(45deg, #B0B0B0, #808080);
+  color: white;
+  border: none;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: background-image 0.2s;
+  margin: 8px auto 30px;
+}
+#next-btn:disabled {
+  background-image: none;
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+#next-btn:not(:disabled):hover {
+  background-image: linear-gradient(45deg, #808080, #B0B0B0);
+}
+
+/* Controls */
+#controls {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 8px;
+}
+button {
+  padding: 10px 20px;
+  font-size: 1.2em;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+#pause-btn {
+  background: linear-gradient(135deg, #ffa500 0%, #ffc107 100%);
+  color: white;
+}
+#pause-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+#quit-btn {
+  background: linear-gradient(135deg, #f44336 0%, #ff7961 100%);
+  color: white;
+}
+#quit-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* History Modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.7);
+}
+.modal-content {
+  background-color: #fff;
+  margin: 10% auto;
+  padding: 10px;
+  border-radius: 10px;
+  width: 80%;
+  max-width: 600px;
+  text-align: center;
+}
+.modal-content h2 {
+  font-size: 1.2em;
+}
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 2em;
+  font-weight: bold;
+  cursor: pointer;
+}
+.close:hover,
+.close:focus {
+  color: black;
+}
+#history-table-container {
+  margin-top: 8px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+th, td {
+  padding: 12px 16px;
+  text-align: center;
+  font-size: 0.9em;
+}
+
+th {
+  background: linear-gradient(180deg, #6fd1b7 0%, #a0e8cf 100%);
+  color: #FFF;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+td {
+  background-color: #fff;
+  border-bottom: 1px solid #eee;
+}
+
+tr:nth-child(even) td {
+  background-color: #f9f9f9;
+}
+
+tr:hover td {
+  background-color: #e0f7fa;
+  transition: background-color 0.3s ease;
+}
+
+/* Open Gifts Button */
+#open-gifts-btn {
+  position: relative;
+  background-color: transparent;
+  border: none;
+  width: 15rem;
+  height: 15rem;
+  display: block;
+  margin: 20px auto;
+  text-align: center;
+  line-height: 50px;
+  font-size: 8em;
+  cursor: pointer;
+  z-index: 1;
+}
+#open-gifts-btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('./bg_effect.png') no-repeat center/cover;
+  border-radius: 10px;
+  animation: rotate 20s linear infinite;
+  z-index: -1;
+}
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.emoji {
+  display: inline-block;
+  animation: shake 1.5s infinite;
+}
+@keyframes shake {
+  0% { transform: translate(1px, 1px) rotate(0deg); }
+  10% { transform: translate(-1px, -2px) rotate(-1deg); }
+  20% { transform: translate(-3px, 0px) rotate(1deg); }
+  30% { transform: translate(3px, 2px) rotate(0); }
+  40% { transform: translate(1px, -1px) rotate(1deg); }
+  50% { transform: translate(-1px, 2px) rotate(-1deg); }
+  60% { transform: translate(-3px, 1px) rotate(0); }
+  70% { transform: translate(3px, 1px) rotate(-1deg); }
+  80% { transform: translate(-1px, -1px) rotate(1deg); }
+  90% { transform: translate(1px, 2px) rotate(0); }
+  100% { transform: translate(1px, -2px) rotate(-1deg); }
+}
+
+/* Settings Modal & Icon Selection */
+#settings-modal .modal-content {
+  max-width: 500px;
+  min-height: 50vh;
+  padding: 10px;
+  text-align: left;
+}
+#settings-modal h2 {
+  font-size: 2em;
+  text-align: center;
+}
+#icon-selection {
+  margin: 2px 0;
+}
+#icon-selection h3 {
+  margin-bottom: 3px;
+  font-size: 1.2em;
+}
+.emoji-scroll-container {
+  display: flex;
+  align-items: center;
+}
+.scroll-btn {
+  background: linear-gradient(135deg, #6fd1b7 0%, #a0e8cf 100%);
+  color: #fff;
+  border: none;
+  padding: 6px 10px;
+  font-size: 1.2em;
+  cursor: pointer;
+  border-radius: 5px;
+  margin: 0 3px;
+  user-select: none;
+}
+.scroll-btn:active {
+  transform: scale(0.95);
+}
+#icon-selection .emoji-list {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  gap: 5px;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+#icon-selection .emoji-list::-webkit-scrollbar {
+  display: none;
+}
+#icon-selection .emoji-option {
+  width: 3rem;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2em;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  transition: border 0.2s;
+}
+#icon-selection .emoji-option.selected {
+  border: 2px solid green;
+}
+#icon-selection .emoji-list {
+  cursor: grab;
+}
+#icon-selection .emoji-list:active {
+  cursor: grabbing;
+}
+let_isDown = false;
+
+/* Stats Section */
+.status-section {
+  background: #f0f8ff;
+  padding: 8px;
+  border-radius: 8px;
+  margin: 8px 0;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+.status-section p {
+  font-size: 1.2em;
+  margin: 4px 0;
+  font-weight: bold;
+  color: #333;
+}
+.profile-emoji {
+  color: #4caf50;
+  margin-right: 5px;
+}
+.profile-number {
+  color: #4caf50;
+  font-weight: bold;
+}
+
+/* Modal Buttons */
+.modal-buttons {
+  text-align: center;
+  margin-top: 8px;
+}
+.modal-buttons button {
+  background: linear-gradient(135deg, #6fd1b7 0%, #a0e8cf 100%);
+  color: #fff;
+  border: none;
+  border-radius: 9999px;
+  padding: 16px 20px;
+  margin: 8px 3px;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: background 0.3s;
+}
+.modal-buttons button:hover {
+  background: linear-gradient(135deg, #a0e8cf 0%, #6fd1b7 100%);
+}
+#settings-modal hr {
+  border: none;
+  height: 1px;
+  background: #eee;
+  margin: 0px 0px 10px 0px;
+}
+
+/* Gift Modal & Gallery - Force Square Images */
+#gift-modal .modal-content {
+  width: 80%;     
+  max-width: 400px;
+  height: 60%;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  text-align: center;
+}
+
+#gift-modal-img {
+  width: 200px;
+  height: 200px;
+  object-fit: contain;
+}
+#gift-gallery-grid .closet-item {
+  width: 200px;
+  height: 200px;
+}
+#gift-gallery-grid .closet-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Game Over */
+.game-over-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 8px;
+}
+.game-over-container h1 {
+  font-size: 2em;
+  margin-bottom: 4px;
+  color: #333;
+}
+.high-score {
+  font-size: 1.5em;
+  text-align: center;
+  margin-bottom: 10px;
+  color: #007BFF;
+}
+.high-score .stat {
+  margin: 0 20px;
+  display: inline-block;
+}
+.highlight-number {
+  color: #ff5722;
+  font-weight: bold;
+}
+.stats-section {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  margin-bottom: 10px;
+}
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.stat-item h2 {
+  font-size: 1.2em;
+  margin-bottom: 2px;
+  color: #666;
+}
+.stat-item p {
+  font-size: 1.2em;
+  color: #000;
+}
+.ratings-section {
+  margin-bottom: 8px;
+  width: 100%;
+  text-align: center;
+}
+.ratings-section h2 {
+  font-size: 2em;
+  margin-bottom: 4px;
+  color: #333;
+}
+.rating-item {
+  margin: 4px 0;
+  font-size: 1.4em;
+}
+.rating-label {
+  font-weight: bold;
+  color: #333;
+  margin-right: 3px;
+}
+.rating-stars {
+  color: gold;
+  margin-right: 3px;
+}
+.rating-value {
+  color: #555;
+}
+.buttons-section {
+  margin-bottom: 8px;
+  width: 100%;
+  text-align: center;
+}
+.restart-section {
+  text-align: center;
+  margin-top: 8px;
+}
+.btn-restart {
+  padding: 16px 32px;
+  background: linear-gradient(135deg, #2196f3 0%, #64b5f6 100%);
+  color: #fff;
+  border: none;
+  border-radius: 9999px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.btn-restart:hover {
+  background: linear-gradient(135deg, #64b5f6 0%, #2196f3 100%);
+}
+
+@media (max-width: 768px) {
+  /* Stack containers vertically and center them */
+  #page-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 5vh;
+    padding: 5px;
+  }
+  /* Hide the left closet */
+  #left-closet {
+    display: none;
+  }
+  
+  #center-container {
+    width: 95vw;
+    min-height: 70vh;
+    margin: 0 auto;
+  }
+  
+  #math-app {
+    width: 100%;
+    min-height: 70vh;
+  }
+  
+  #right-closet {
+    width: 95vw;
+    min-height: 20vh;
+    margin: 0 auto;
+  }
+
+  th, td {
+    padding: 2px 6px;
+    font-size: 0.7em;
+  }
+
+  .game-over-container {
+    width: 100%;
+    height: 100%;
+  }
+  
+  #header,
+  #stats-row,
+  #controls {
+    flex-direction: row;
+    align-items: center;
+  }
+  #header-left h1 {
+    font-size: 1.2em;
+  }
+  #lives {
+    font-size: 1.2em;
+  }
+  .closet h2 {
+    font-size: 1em;
+  }
+  .option {
+    padding: 10px;
+    font-size: 1.5em;
+  }
+  #timer-text {
+    font-size: 1em;
+    margin-bottom: 20px;
+  }
+  #next-btn {
+    width: 90%;
+    padding: 10px 15px;
+    font-size: 1em;
+    margin-bottom: 20px;
+  }
+  #open-gifts-btn {
+    width: 10rem;
+    height: 10rem;
+    font-size: 5em;
+  }
+  #open-gifts-btn::before {
+    width: 100%;
+    height: 100%;
+  }
+    #gift-gallery-grid .closet-item {
+    width: 4.8em;
+    height: 4.8em;
+  }
+}
+  </style>
+</head>
+<body>
+  <div id="page-container">
+    <div id="left-closet" class="closet">
+      <h2 id="left-closet-header">Unlocked Gifts (0/80)</h2>
+      <div class="closet-grid" id="left-closet-grid"></div>
+      <!-- View All Gifts Button for left closet -->
+      <button id="view-all-gifts-btn-left" class="view-all-btn">View All Gifts</button>
+    </div>
+    <div id="center-container">
+      <div id="math-app">
+        <!-- Normal gameplay content will be replaced by game over screen when the game ends -->
+        <div id="gameplay-content">
+          <div id="header">
+            <div id="header-left">
+              <button id="settings-btn">
+                <span id="settings-icon">👶</span>
+              </button>
+              <h1 id="title">Math Game</h1>
+            </div>
+            <div id="lives">❤️❤️❤️❤️❤️</div>
+          </div>
+          <div id="stats-row">
+            <div id="high-score">High Score: 0</div>
+            <div id="score">Score: 0</div>
+          </div>
+          <div id="progress-wrapper">
+            <div id="progress-container">
+              <div id="progress-bar"></div>
+            </div>
+            <div id="gift-count">🎁 Gifts: 0</div>
+          </div>
+          <div id="problem"></div>
+          <div id="options"></div>
+          <div id="timer">
+            <div id="timer-bar"></div>
+          </div>
+          <div id="timer-text">Timer: 10 sec</div>
+          <button id="next-btn" disabled>Next</button>
+          <div id="controls">
+            <button id="pause-btn">Pause</button>
+            <button id="quit-btn">Quit</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="right-closet" class="closet">
+      <h2 id="right-closet-header">Unlocked Gifts (0/80)</h2>
+      <div class="closet-grid" id="right-closet-grid"></div>
+      <!-- View All Gifts Button for right closet -->
+      <button id="view-all-gifts-btn-right" class="view-all-btn">View All Gifts</button>
+    </div>
+  </div>
+  
+  <!-- History modal -->
+  <div id="history-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="history-modal-close">&times;</span>
+      <h2>Match History</h2>
+      <div id="history-table-container"></div>
+    </div>
+  </div>
+  
+  <!-- Settings modal -->
+  <div id="settings-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="settings-modal-close">&times;</span>
+      <h2>Profile</h2>
+      <hr>
+      <!-- Icon selection -->
+      <div id="icon-selection">
+        <h3>Profile Icon</h3>
+        <div class="emoji-scroll-container">
+          <button class="scroll-btn left-btn"><</button>
+          <div class="emoji-list">
+            <span class="emoji-option">👶</span>
+            <span class="emoji-option">🧒</span>
+            <span class="emoji-option">👦</span>
+            <span class="emoji-option">👧</span>
+            <span class="emoji-option">🧑</span>
+            <span class="emoji-option">👱</span>
+            <span class="emoji-option">👨</span>
+            <span class="emoji-option">🧔</span>
+            <span class="emoji-option">👨‍🦰</span>
+            <span class="emoji-option">👨‍🦱</span>
+            <span class="emoji-option">👨‍🦳</span>
+            <span class="emoji-option">👨‍🦲</span>
+            <span class="emoji-option">👩</span>
+            <span class="emoji-option">👩‍🦰</span>
+            <span class="emoji-option">👩‍🦱</span>
+            <span class="emoji-option">👩‍🦳</span>
+            <span class="emoji-option">👩‍🦲</span>
+            <span class="emoji-option">👱‍♀️</span>
+            <span class="emoji-option">👱‍♂️</span>
+            <span class="emoji-option">🧓</span>
+            <span class="emoji-option">👴</span>
+            <span class="emoji-option">👵</span>
+          </div>
+          <button class="scroll-btn right-btn">></button>
+        </div>
+      </div>
+      <hr>
+      <!-- Stats section -->
+<div class="status-section">
+  <p><i class="fas fa-gamepad profile-emoji"></i> Matches Played: <span class="profile-number" id="total-matches">0</span></p>
+  <p><i class="fas fa-check-circle profile-emoji"></i> Right Answers: <span class="profile-number" id="total-right">0</span></p>
+  <p><i class="fas fa-times-circle profile-emoji"></i> Wrong Answers: <span class="profile-number" id="total-wrong">0</span></p>
+  <p><i class="fas fa-fire profile-emoji"></i> Highest Streak: <span class="profile-number" id="alltime-high-streak-modal">0</span></p>
+  <p><i class="fas fa-calendar-alt profile-emoji"></i> Starting Date: <span class="profile-number" id="starting-date">N/A</span></p>
+  <p><i class="fas fa-stopwatch profile-emoji"></i> Time Spent: <span class="profile-number" id="total-time">0d : 0h : 0m : 0s</span></p>
+</div>
+
+      <hr>
+      <!-- Modal Buttons -->
+      <div class="modal-buttons">
+        <button id="history-btn">Match History</button>
+        <button id="gift-reset-btn">Gift Reset</button>
+        <button id="factory-reset-btn">Factory Reset</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Confirmation Modal -->
+  <div id="confirmation-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="confirmation-modal-close">&times;</span>
+      <h2 id="confirmation-message">Confirmation</h2>
+      <div class="modal-buttons">
+        <button id="confirm-yes-btn">Yes</button>
+        <button id="confirm-no-btn">No</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Info Modal -->
+  <div id="info-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="info-modal-close">&times;</span>
+      <h2 id="info-message">Info</h2>
+      <div class="modal-buttons">
+        <button id="info-ok-btn">OK</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Gift Popup Modal -->
+  <div id="gift-modal" class="modal">
+    <div class="modal-content" style="text-align:center;">
+      <img id="gift-modal-img" src="" alt="New Gift">
+      <p>Congratulations! You've unlocked a new gift!</p>
+      <button id="gift-modal-close-btn">Close</button>
+    </div>
+  </div>
+  
+  <!-- Gift Gallery Modal -->
+  <div id="gift-gallery-modal" class="modal">
+    <div class="modal-content" style="max-width:90%;">
+      <span class="close" id="gift-gallery-close">&times;</span>
+      <h2>Unlocked Gifts Gallery</h2>
+      <div id="gift-gallery-grid" class="closet-grid"></div>
+    </div>
+  </div>
+  
+  <script>
+    // Helper: format seconds into "d : h : m : s"
+    function formatTime(seconds) {
+      seconds = Math.floor(seconds);
+      const d = Math.floor(seconds / 86400);
+      seconds %= 86400;
+      const h = Math.floor(seconds / 3600);
+      seconds %= 3600;
+      const m = Math.floor(seconds / 60);
+      const s = seconds % 60;
+      return `${d}d : ${h}h : ${m}m : ${s}s`;
+    }
+    
+    // Gift req & images
+    const giftRequirement = 1;
+    const basePath = "Pictures/";
+    let giftImages = Array.from({ length: 150 }, (_, i) => `${basePath}${i + 1}.jpg`);
+    
+    let unlockedGifts = JSON.parse(localStorage.getItem("unlockedGifts") || "[]");
+    
+    // Track wrong answers (now accumulates over the match)
+    let wrongAnswers = 0;
+    
+    const problemEl = document.getElementById('problem'),
+          optionsEl = document.getElementById('options'),
+          timerBarEl = document.getElementById('timer-bar'),
+          timerTextEl = document.getElementById('timer-text'),
+          scoreEl = document.getElementById('score'),
+          livesEl = document.getElementById('lives'),
+          nextBtn = document.getElementById('next-btn'),
+          pauseBtn = document.getElementById('pause-btn'),
+          quitBtn = document.getElementById('quit-btn'),
+          progressBarEl = document.getElementById('progress-bar'),
+          giftCountEl = document.getElementById('gift-count'),
+          settingsBtn = document.getElementById('settings-btn'),
+          leftClosetGrid = document.getElementById('left-closet-grid'),
+          rightClosetGrid = document.getElementById('right-closet-grid'),
+          leftClosetHeader = document.getElementById('left-closet-header'),
+          rightClosetHeader = document.getElementById('right-closet-header'),
+          historyModal = document.getElementById('history-modal'),
+          historyModalClose = document.getElementById('history-modal-close'),
+          settingsModal = document.getElementById('settings-modal'),
+          settingsModalClose = document.getElementById('settings-modal-close'),
+          historyTableContainer = document.getElementById('history-table-container'),
+          giftResetBtn = document.getElementById('gift-reset-btn'),
+          factoryResetBtn = document.getElementById('factory-reset-btn');
+    
+    // Set profile icon
+    const settingsIconEl = document.getElementById('settings-icon');
+    let storedIcon = localStorage.getItem('profileIcon') || '👶';
+    settingsIconEl.textContent = storedIcon;
+    
+    // Emoji events
+    const emojiOptions = document.querySelectorAll('.emoji-option');
+    emojiOptions.forEach(option => {
+      option.addEventListener('click', () => {
+        emojiOptions.forEach(opt => opt.classList.remove('selected'));
+        option.classList.add('selected');
+        settingsIconEl.textContent = option.textContent;
+        localStorage.setItem('profileIcon', option.textContent);
+      });
+    });
+    
+    // Arrow scroll
+    const emojiList = document.querySelector("#icon-selection .emoji-list");
+    const leftBtn = document.querySelector(".left-btn");
+    const rightBtn = document.querySelector(".right-btn");
+    
+    let scrollInterval;
+    function startScrolling(direction) {
+      let scrollSpeed = 1;
+      return setInterval(() => {
+        emojiList.scrollLeft += direction * scrollSpeed;
+        scrollSpeed += 0.2;
+      }, 30);
+    }
+    
+    leftBtn.addEventListener("mousedown", () => { scrollInterval = startScrolling(-1); });
+    leftBtn.addEventListener("mouseup", () => clearInterval(scrollInterval));
+    leftBtn.addEventListener("mouseleave", () => clearInterval(scrollInterval));
+    
+    rightBtn.addEventListener("mousedown", () => { scrollInterval = startScrolling(1); });
+    rightBtn.addEventListener("mouseup", () => clearInterval(scrollInterval));
+    rightBtn.addEventListener("mouseleave", () => clearInterval(scrollInterval));
+    
+    // Touch events for emoji list
+    let isDown = false, startX, scrollLeftPos;
+    emojiList.addEventListener('mousedown', (e) => {
+      isDown = true;
+      startX = e.pageX - emojiList.offsetLeft;
+      scrollLeftPos = emojiList.scrollLeft;
+    });
+    emojiList.addEventListener('mouseleave', () => { isDown = false; });
+    emojiList.addEventListener('mouseup', () => { isDown = false; });
+    emojiList.addEventListener('mousemove', (e) => {
+      if(!isDown) return;
+      e.preventDefault();
+      const x = e.pageX - emojiList.offsetLeft;
+      const walk = (x - startX) * 1;
+      emojiList.scrollLeft = scrollLeftPos - walk;
+    });
+    emojiList.addEventListener('touchstart', (e) => {
+      isDown = true;
+      startX = e.touches[0].pageX - emojiList.offsetLeft;
+      scrollLeftPos = emojiList.scrollLeft;
+    });
+    emojiList.addEventListener('touchend', () => { isDown = false; });
+    emojiList.addEventListener('touchmove', (e) => {
+      if(!isDown) return;
+      const x = e.touches[0].pageX - emojiList.offsetLeft;
+      const walk = (x - startX) * 1;
+      emojiList.scrollLeft = scrollLeftPos - walk;
+    });
+    
+    // Update settings modal with stats and formatted time
+    settingsBtn.addEventListener('click', () => {
+      let matchHistory = JSON.parse(localStorage.getItem('matchHistory') || '[]');
+      let totalMatches = matchHistory.length;
+      let totalRight = matchHistory.reduce((acc, m) => acc + (parseInt(m.score) || 0), 0);
+      let totalWrong = matchHistory.reduce((acc, m) => acc + (parseInt(m.wrong) || 0), 0);
+      let startingDate = totalMatches > 0 ? matchHistory[0].date : "N/A";
+      let totalTime = matchHistory.reduce((acc, m) => acc + (parseFloat(m.totalTimeSpent) || 0), 0);
+      
+      document.getElementById('total-matches').innerText = totalMatches;
+      document.getElementById('total-right').innerText = totalRight;
+      document.getElementById('total-wrong').innerText = totalWrong;
+      document.getElementById('starting-date').innerText = startingDate;
+      document.getElementById('total-time').innerText = formatTime(totalTime);
+      document.getElementById('alltime-high-streak-modal').innerText = localStorage.getItem('allTimeHighStreak') || 0;
+      
+      emojiOptions.forEach(opt => {
+        if(opt.textContent === settingsIconEl.textContent) {
+          opt.classList.add('selected');
+        } else {
+          opt.classList.remove('selected');
+        }
+      });
+      
+      settingsModal.style.display = "block";
+    });
+    
+    settingsModalClose.onclick = () => { settingsModal.style.display = "none"; };
+    
+    // History modal action
+    const historyBtn = document.getElementById('history-btn');
+    
+    historyBtn.addEventListener('click', () => {
+      settingsModal.style.display = "none";
+      let matchHistory = JSON.parse(localStorage.getItem('matchHistory') || '[]');
+      if(matchHistory.length === 0) {
+        historyTableContainer.innerHTML = "<p>No match history available.</p>";
+      } else {
+        let tableHTML = `<table>
+                           <thead>
+                             <tr>
+                               <th>Date</th>
+                               <th>Score</th>
+                               <th>Wrong</th>
+                               <th>Avg Time (sec)</th>
+                               <th>Gifts</th>
+                               <th>Highest Streak</th>
+                               <th>Final Rating</th>
+                             </tr>
+                           </thead>
+                           <tbody>`;
+        matchHistory.slice().reverse().forEach(match => {
+          tableHTML += `<tr>
+                          <td>${match.date}<br>${match.time}</td>
+                          <td>${match.score}</td>
+                          <td>${match.wrong}</td>
+                          <td>${match.avgTime}</td>
+                          <td>${match.gifts}</td>
+                          <td>${match.highestStreak || 0}</td>
+                          <td>${match.finalRating}/5</td>
+                        </tr>`;
+        });
+        tableHTML += `</tbody></table>`;
+        historyTableContainer.innerHTML = tableHTML;
+      }
+      historyModal.style.display = "block";
+    });
+    historyModalClose.onclick = () => { historyModal.style.display = "none"; };
+    
+    // Custom modals: Confirmation and Info
+    function showConfirmation(message, callback) {
+      const confirmationModal = document.getElementById("confirmation-modal");
+      const confirmationMessage = document.getElementById("confirmation-message");
+      const yesBtn = document.getElementById("confirm-yes-btn");
+      const noBtn = document.getElementById("confirm-no-btn");
+      confirmationMessage.textContent = message;
+      confirmationModal.style.display = "block";
+      
+      function cleanup() {
+        confirmationModal.style.display = "none";
+        yesBtn.removeEventListener("click", onYes);
+        noBtn.removeEventListener("click", onNo);
+      }
+      
+      function onYes() {
+        cleanup();
+        callback(true);
+      }
+      function onNo() {
+        cleanup();
+        callback(false);
+      }
+      
+      yesBtn.addEventListener("click", onYes);
+      noBtn.addEventListener("click", onNo);
+      
+      // Also handle closing via the "×" icon
+      const closeIcon = document.getElementById("confirmation-modal-close");
+      closeIcon.onclick = function() {
+        cleanup();
+        callback(false);
+      };
+    }
+
+    function showInfo(message) {
+      const infoModal = document.getElementById("info-modal");
+      const infoMessage = document.getElementById("info-message");
+      const okBtn = document.getElementById("info-ok-btn");
+      infoMessage.textContent = message;
+      infoModal.style.display = "block";
+      
+      function cleanup() {
+        infoModal.style.display = "none";
+        okBtn.removeEventListener("click", onOk);
+      }
+      
+      function onOk() {
+        cleanup();
+      }
+      
+      okBtn.addEventListener("click", onOk);
+      
+      // Also handle closing via the "×" icon
+      const closeIcon = document.getElementById("info-modal-close");
+      closeIcon.onclick = function() {
+        cleanup();
+      };
+    }
+    
+    // Gift Reset using custom modal
+    giftResetBtn.addEventListener('click', () => {
+      showConfirmation("Are you sure you want to reset all unlocked gifts?", (confirmed) => {
+        if (confirmed) {
+          unlockedGifts = [];
+          saveData();
+          updateClosets();
+          showInfo("All unlocked gifts have been reset.");
+        }
+      });
+    });
+    
+    // Factory Reset using custom modal
+    factoryResetBtn.addEventListener('click', () => {
+      showConfirmation("Are you sure you want to factory reset? This will clear all game data.", (confirmed) => {
+        if (confirmed) {
+          localStorage.clear();
+          location.reload();
+        }
+      });
+    });
+    
+    function saveData() {
+      localStorage.setItem("unlockedGifts", JSON.stringify(unlockedGifts));
+    }
+    
+    // Update high score display
+    function updateHighScoreDisplay() {
+      let matchHistory = JSON.parse(localStorage.getItem('matchHistory') || '[]');
+      let high = 0;
+      if(matchHistory.length > 0) {
+        high = Math.max(...matchHistory.map(m => m.score));
+      }
+      document.getElementById('high-score').innerText = "High Score: " + high;
+    }
+    
+    function updateLives() {
+      livesEl.textContent = '❤️'.repeat(lives);
+      if(lives <= 0) { showGameOverStats(); }
+    }
+    function updateProgressBar() {
+      const percentage = (progressCount / giftRequirement) * 100;
+      progressBarEl.style.width = percentage + '%';
+    }
+    function updateGiftCount() {
+      giftCountEl.textContent = `🎁 Gifts: ${Math.floor(score / giftRequirement)}`;
+    }
+    function updateClosetHeaders() {
+      leftClosetHeader.textContent = `Unlocked Gifts (${unlockedGifts.length}/${giftImages.length})`;
+      rightClosetHeader.textContent = `Unlocked Gifts (${unlockedGifts.length}/${giftImages.length})`;
+    }
+    // Updated updateClosets() to reverse order and highlight the newest gift with golden glow.
+    function updateClosets() {
+      function buildCloset(gridElement) {
+        gridElement.innerHTML = '';
+        for (let i = unlockedGifts.length - 1; i >= 0; i--) {
+          const gift = unlockedGifts[i];
+          const item = document.createElement('div');
+          item.className = 'closet-item';
+          if (i === unlockedGifts.length - 1) {
+            item.classList.add('newly-unlocked');
+            setTimeout(() => { item.classList.remove('newly-unlocked'); }, 2000);
+          }
+          const img = document.createElement('img');
+          img.src = gift;
+          item.appendChild(img);
+          gridElement.appendChild(item);
+        }
+      }
+      buildCloset(leftClosetGrid);
+      buildCloset(rightClosetGrid);
+      updateClosetHeaders();
+    }
+    updateClosets();
+    
+    // "View All Gifts" Gallery Modal functionality for both closets
+    document.querySelectorAll('.view-all-btn').forEach(btn => {
+      btn.addEventListener("click", () => {
+        const galleryModal = document.getElementById("gift-gallery-modal");
+        const galleryGrid = document.getElementById("gift-gallery-grid");
+        galleryGrid.innerHTML = '';
+        // Show gifts in reverse order so that newest appear first
+        unlockedGifts.slice().reverse().forEach(gift => {
+          const item = document.createElement('div');
+          item.className = 'closet-item';
+          const img = document.createElement('img');
+          img.src = gift;
+          item.appendChild(img);
+          galleryGrid.appendChild(item);
+        });
+        galleryModal.style.display = "block";
+      });
+    });
+    
+    document.getElementById("gift-gallery-close").addEventListener("click", () => {
+      document.getElementById("gift-gallery-modal").style.display = "none";
+    });
+    
+    let score = 0, lives = 5, currentProblem = {}, timer, timeLeft = 10, paused = false;
+    let problemTimes = [], problemStartTime, progressCount = 0;
+    // Global variable to track the right answer streak
+    let rightStreak = 0;
+    // New variables: match's highest streak in this match and all-time highest streak from local storage
+    let matchHighStreak = 0;
+    let allTimeHighStreak = parseInt(localStorage.getItem('allTimeHighStreak')) || 0;
+    
+    function showGameOverStats() {
+      clearInterval(timer);
+      const totalTime = problemTimes.reduce((acc, t) => acc + t, 0);
+      const avgTime = problemTimes.length ? (totalTime / problemTimes.length).toFixed(2) : 0;
+      const totalGifts = Math.floor(score / giftRequirement);
+      
+      let ratingScore;
+      if (score >= 20) ratingScore = 5;
+      else if (score >= 15) ratingScore = 4;
+      else if (score >= 10) ratingScore = 3;
+      else if (score >= 5) ratingScore = 2;
+      else ratingScore = 1;
+      
+      const avgTimeVal = parseFloat(avgTime);
+      let ratingTime;
+      if (avgTimeVal < 3) ratingTime = 5;
+      else if (avgTimeVal < 4) ratingTime = 4;
+      else if (avgTimeVal < 5) ratingTime = 3;
+      else if (avgTimeVal < 8) ratingTime = 2;
+      else ratingTime = 1;
+      
+      const finalRating = Math.round((ratingScore + ratingTime) / 2);
+      
+      // Update all-time highest streak if current match streak is higher
+      if(matchHighStreak > allTimeHighStreak) {
+        allTimeHighStreak = matchHighStreak;
+        localStorage.setItem('allTimeHighStreak', allTimeHighStreak);
+      }
+      
+      let matchHistory = JSON.parse(localStorage.getItem('matchHistory') || '[]');
+      const now = new Date();
+      const currentMatch = {
+        score: score,
+        wrong: wrongAnswers,
+        avgTime: avgTime,
+        gifts: totalGifts,
+        highestStreak: matchHighStreak,
+        totalTimeSpent: totalTime.toFixed(2),
+        ratingScore: ratingScore,
+        ratingTime: ratingTime,
+        finalRating: finalRating,
+        date: now.toLocaleDateString(),     
+        time: now.toLocaleTimeString()
+      };
+      matchHistory.push(currentMatch);
+      if(matchHistory.length > 30) { matchHistory = matchHistory.slice(matchHistory.length - 30); }
+      localStorage.setItem('matchHistory', JSON.stringify(matchHistory));
+      
+      const highScore = Math.max(...matchHistory.map(m => m.score));
+      
+      function renderStars(rating) {
+        let stars = "";
+        for (let i = 0; i < 5; i++) {
+          stars += i < rating ? "★" : "☆";
+        }
+        return stars;
+      }
+      
+      let giftsOpenedThisMatch = 0;
+      const giftSectionHTML = totalGifts > 0 
+        ? `<div class="buttons-section">
+             <button id="open-gifts-btn"><span class="emoji">🎁</span></button>
+             <div id="gift-status-text">Tap To Open Gift (0/${totalGifts})</div>
+           </div>`
+        : "";
+      
+      // Replace gameplay content with game over screen that fills the center container
+      const mathApp = document.getElementById("math-app");
+      mathApp.innerHTML = `<div class="game-over-container">
+          <h1>Game Over</h1>
+          <div class="high-score">
+             <span class="stat">High Score: <span class="highlight-number">${highScore}</span></span>
+             <span class="stat">Highest Streak: <span class="highlight-number">${allTimeHighStreak}</span></span>
+          </div>
+
+          <div class="stats-section">
+            <div class="stat-item">
+              <h2>Score</h2>
+              <p>${score}</p>
+            </div>
+            <div class="stat-item">
+              <h2>Avg Time</h2>
+              <p>${avgTime} sec</p>
+            </div>
+            <div class="stat-item">
+              <h2>Gifts</h2>
+              <p>${totalGifts}</p>
+            </div>
+            <div class="stat-item">
+              <h2>Best Streak</h2>
+              <p>${matchHighStreak}</p>
+            </div>
+          </div>
+          <div class="ratings-section">
+            <h2>Ratings</h2>
+            <div class="rating-item">
+              <span class="rating-label">Accuracy:</span>
+              <span class="rating-stars">${renderStars(ratingScore)}</span>
+              <span class="rating-value">(${ratingScore}/5)</span>
+            </div>
+            <div class="rating-item">
+              <span class="rating-label">Speed:</span>
+              <span class="rating-stars">${renderStars(ratingTime)}</span>
+              <span class="rating-value">(${ratingTime}/5)</span>
+            </div>
+            <div class="rating-item">
+              <span class="rating-label">Final:</span>
+              <span class="rating-stars">${renderStars(finalRating)}</span>
+              <span class="rating-value">(${finalRating}/5)</span>
+            </div>
+          </div>
+          ${giftSectionHTML}
+          <div class="restart-section">
+            <button id="restart-btn" class="btn-restart">Restart Game</button>
+          </div>
+      </div>`;
+      
+      document.getElementById("restart-btn").addEventListener("click", () => location.reload());
+      
+      if(totalGifts > 0) {
+        const openBtn = document.getElementById("open-gifts-btn");
+        const giftText = document.getElementById("gift-status-text");
+        // Gift Popup Modal elements
+        const giftModal = document.getElementById("gift-modal");
+        const modalImg = document.getElementById("gift-modal-img");
+
+        openBtn.addEventListener("click", () => {
+          if(giftsOpenedThisMatch >= totalGifts) {
+            openBtn.style.display = "none";
+            giftText.style.display = "none";
+            return;
+          }
+          const notYetUnlocked = giftImages.filter(gift => !unlockedGifts.includes(gift));
+          if (notYetUnlocked.length === 0) {
+            openBtn.style.display = "none";
+            giftText.style.display = "none";
+            return;
+          }
+          const randomIndex = Math.floor(Math.random() * notYetUnlocked.length);
+          const gift = notYetUnlocked[randomIndex];
+          unlockedGifts.push(gift);
+          giftsOpenedThisMatch++;
+          // Show the gift in a modal popup with square image
+          modalImg.src = gift;
+          giftModal.style.display = "flex";
+          document.getElementById("gift-modal-close-btn").onclick = () => {
+            giftModal.style.display = "none";
+            updateClosets();
+            saveData();
+            giftText.innerText = `Open Gift (${giftsOpenedThisMatch}/${totalGifts})`;
+            if(giftsOpenedThisMatch >= totalGifts) {
+              openBtn.style.display = "none";
+              giftText.style.display = "none";
+            }
+          };
+        });
+      }
+      
+      updateHighScoreDisplay();
+    }
+    
+    function generateProblem() {
+      if(lives <= 0) return;
+      paused = false;
+      pauseBtn.textContent = 'Pause';
+      timeLeft = 10;
+      problemStartTime = Date.now();
+      // Removed wrongAnswers reset to allow accumulation over the match
+      const operations = ['+', '-', '*', '/'];
+      const operation = operations[Math.floor(Math.random() * operations.length)];
+      let num1, num2, answer;
+      switch(operation) {
+        case '+': 
+          num1 = Math.floor(Math.random() * 20) + 1;
+          num2 = Math.floor(Math.random() * 20) + 1;
+          answer = num1 + num2; 
+          break;
+        case '-': 
+          num1 = Math.floor(Math.random() * 20) + 1;
+          num2 = Math.floor(Math.random() * num1) + 1;
+          answer = num1 - num2; 
+          break;
+        case '*': 
+          num1 = Math.floor(Math.random() * 10) + 1;
+          num2 = Math.floor(Math.random() * 10) + 1;
+          answer = num1 * num2; 
+          break;
+        case '/': 
+          num2 = Math.floor(Math.random() * 9) + 1;
+          answer = Math.floor(Math.random() * 10) + 1;
+          num1 = num2 * answer; 
+          break;
+      }
+      currentProblem = { num1, num2, operation, answer };
+      currentProblem.displayOp = (currentProblem.operation === '*') ? '×' : (currentProblem.operation === '/') ? '÷' : currentProblem.operation;
+      displayProblem();
+      startTimer();
+    }
+    
+    function displayProblem() {
+      problemEl.textContent = `${currentProblem.num1} ${currentProblem.displayOp} ${currentProblem.num2} = ?`;
+      optionsEl.innerHTML = '';
+      const options = [currentProblem.answer, currentProblem.answer + 1, currentProblem.answer - 1, currentProblem.answer + 2]
+                        .sort(() => Math.random() - 0.5);
+      options.forEach(option => {
+        const optionEl = document.createElement('div');
+        optionEl.className = 'option';
+        optionEl.textContent = option;
+        optionEl.addEventListener('click', () => selectAnswer(option, optionEl));
+        optionsEl.appendChild(optionEl);
+      });
+    }
+    
+    function startTimer() {
+      clearInterval(timer);
+      updateTimerDisplay();
+      timer = setInterval(() => {
+        if(!paused) {
+          timeLeft -= 0.1;
+          updateTimerDisplay();
+          if(timeLeft <= 0) { clearInterval(timer); timeUp(); }
+        }
+      }, 100);
+    }
+    
+    function updateTimerDisplay() {
+      timerBarEl.style.width = `${(timeLeft / 10) * 100}%`;
+      timerTextEl.textContent = `Timer: ${Math.ceil(timeLeft)} sec`;
+    }
+    
+    function disableOptions() {
+      document.querySelectorAll('.option').forEach(el => el.style.pointerEvents = 'none');
+    }
+    
+    // Insert CSS for the streak popup styling and animation
+    const popupStyle = document.createElement('style');
+    popupStyle.innerHTML = `
+    @keyframes popupAnimation {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -20px) scale(0.8);
+      }
+      50% {
+        opacity: 1;
+        transform: translate(-50%, 0) scale(1.05);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -20px) scale(1);
+      }
+    }
+    #streak-popup {
+      position: fixed;
+      top: 10%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 300px;      
+      height: 50px;   
+      background: linear-gradient(135deg, #ff7e5f, #feb47b);
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      color: #fff;
+      font-size: 1.6rem;
+      font-weight: bold;
+      pointer-events: none;
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 1em 1em;
+    }
+    @media (max-width: 480px) {
+      #streak-popup {
+        width: 250px;        
+        height: 40px;        
+        font-size: 1.2rem;
+      }
+    }
+    `;
+    document.head.appendChild(popupStyle);
+
+    // Create the streak popup element
+    const streakPopup = document.createElement('div');
+    streakPopup.id = 'streak-popup';
+    document.body.appendChild(streakPopup);
+
+    // Function to display the streak popup with an encouraging message
+    function showStreakPopup(message, streakCount) {
+      streakPopup.textContent = `${message} (Streak: ${streakCount})`;
+      streakPopup.style.display = 'block';
+      streakPopup.style.animation = 'popupAnimation 2s ease-out forwards';
+  
+      // Hide the popup after the animation completes
+      setTimeout(() => {
+        streakPopup.style.display = 'none';
+        streakPopup.style.animation = '';
+      }, 1500);
+    }
+    
+    function selectAnswer(selected, selectedEl) {
+      clearInterval(timer);
+      disableOptions();
+      const timeTaken = ((Date.now() - problemStartTime) / 1000).toFixed(2);
+      problemTimes.push(Number(timeTaken));
+
+      if (selected === currentProblem.answer) {
+        // Increment the correct answer streak
+        rightStreak++;
+        // Update the match's highest streak if needed
+        matchHighStreak = Math.max(matchHighStreak, rightStreak);
+
+        // Always highlight the correct answer with a green gradient and white text
+        document.querySelectorAll('.option').forEach(el => {
+          if (parseInt(el.textContent) === currentProblem.answer) {
+            el.style.backgroundImage = 'linear-gradient(45deg, #A1DD9D, #2BCDA8)';
+            el.style.color = 'white';
+          }
+        });
+        progressCount++;
+        updateProgressBar();
+        score++;
+        scoreEl.textContent = `Score: ${score}`;
+
+        // Show streak popup starting at 3 right answers
+        if (rightStreak >= 3 && (rightStreak === 3 || ((rightStreak - 3) % 1 === 0))) {
+          const encouragementWords = [
+            "WOW 😮", 
+            "NICE JOB 👍", 
+            "EXCELLENT 🌟", 
+            "GREAT 👌", 
+            "SUPERB 🎉", 
+            "AWESOME 😎", 
+            "BRILLIANT 💡", 
+            "PHENOMENAL 🔥", 
+            "SENSATIONAL 🚀", 
+            "FANTASTIC ✨"
+          ];
+          const message = encouragementWords[(rightStreak - 3) % encouragementWords.length];
+          showStreakPopup(message, rightStreak);
+        }
+        
+        // Add a delay before resetting the progress bar when the requirement is met
+        if (progressCount >= giftRequirement) {
+          setTimeout(() => {
+            progressCount = 0;
+            updateProgressBar();
+          }, 500);
+        }
+      } else {
+        // Reset streak on a wrong answer
+        rightStreak = 0;
+        
+        // Style the wrong answer with a red gradient and white text
+        selectedEl.style.backgroundImage = 'linear-gradient(180deg, #FF4500, #FF6347)';
+        selectedEl.style.color = 'white';
+        
+        // Also highlight the correct answer
+        document.querySelectorAll('.option').forEach(el => {
+          if (parseInt(el.textContent) === currentProblem.answer) {
+            el.style.backgroundImage = 'linear-gradient(45deg, #A1DD9D, #2BCDA8)';
+            el.style.color = 'white';
+          }
+        });
+        lives--;
+        wrongAnswers++;
+        updateLives();
+      }
+      updateGiftCount();
+      nextBtn.disabled = false;
+    }
+    
+    function timeUp() {
+      disableOptions();
+      problemTimes.push(10);
+      document.querySelectorAll('.option').forEach(el => {
+        if(parseInt(el.textContent) === currentProblem.answer) { 
+            el.style.backgroundImage = 'linear-gradient(45deg, #A1DD9D, #2BCDA8)';
+            el.style.color = 'white';
+        }
+      });
+      lives--;
+      updateLives();
+      nextBtn.disabled = false;
+    }
+    
+    pauseBtn.addEventListener('click', () => {
+      if(!paused) { paused = true; pauseBtn.textContent = 'Resume'; clearInterval(timer); }
+      else { paused = false; pauseBtn.textContent = 'Pause'; startTimer(); }
+    });
+    
+    nextBtn.addEventListener('click', () => { generateProblem(); nextBtn.disabled = true; });
+    
+    quitBtn.addEventListener('click', () => {
+      clearInterval(timer);
+      disableOptions();
+      if(timeLeft < 10) {
+        const timeTaken = ((Date.now() - problemStartTime) / 1000).toFixed(2);
+        problemTimes.push(Number(timeTaken));
+      }
+      showGameOverStats();
+    });
+    
+    // Initialize high score and start the game
+    updateHighScoreDisplay();
+    generateProblem();
+  </script>
+</body>
+</html>
