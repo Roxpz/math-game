@@ -22,6 +22,8 @@ body, button {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
 }
 
 /* Layout Container */
@@ -103,7 +105,7 @@ body, button {
 }
 #math-app {
   background-color: white;
-  padding: 0; 
+  padding: 0px 0px 8px 0px; /* botton space*/
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
   min-height: 90vh;
@@ -192,17 +194,17 @@ body, button {
 /* Problem & Options */
 #problem {
   font-size: 2.5em;
-  margin: 8px;
+  margin: 20px;
   text-align: center;
 }
 #options {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
+  gap: 12px;
   margin: 8px;
 }
 .option {
-  padding: 12px;
+  padding: 2rem;
   font-size: 2em;
   cursor: pointer;
   transition: transform 0.2s, background-color 0.3s;
@@ -309,7 +311,7 @@ button {
   margin: 10% auto;
   padding: 10px;
   border-radius: 10px;
-  width: 80%;
+  width: 95%;
   max-width: 600px;
   text-align: center;
 }
@@ -327,6 +329,16 @@ button {
 .close:focus {
   color: black;
 }
+/* Specific styles for the confirmation modal's content */
+#confirmation-modal .modal-content {
+  width: 300px;     
+  height: 200px;
+}
+#confirmation-modal .modal-buttons {
+  margin:50px;
+}
+
+
 #history-table-container {
   margin-top: 8px;
   overflow-x: auto;
@@ -555,14 +567,28 @@ let_isDown = false;
   height: 200px;
   object-fit: contain;
 }
+/* Make the gallery grid responsive */
+#gift-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 5px;
+}
 #gift-gallery-grid .closet-item {
-  width: 200px;
-  height: 200px;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border: 1px solid #ddd;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #fff;
 }
 #gift-gallery-grid .closet-item img {
   width: 100%;
   height: 100%;
   object-fit: contain;
+}
+#gift-gallery-modal .modal-content h2 {
+  margin-bottom: 20px;
 }
 
 /* Game Over */
@@ -579,7 +605,7 @@ let_isDown = false;
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  padding: 8px;
+  padding: 10px;
 }
 .game-over-container h1 {
   font-size: 2em;
@@ -685,13 +711,12 @@ let_isDown = false;
   
   #center-container {
     width: 95vw;
-    min-height: 70vh;
     margin: 0 auto;
   }
   
   #math-app {
     width: 100%;
-    min-height: 70vh;
+    min-height: 75vh;
   }
   
   #right-closet {
@@ -726,7 +751,7 @@ let_isDown = false;
     font-size: 1em;
   }
   .option {
-    padding: 10px;
+    padding: 2rem;
     font-size: 1.5em;
   }
   #timer-text {
@@ -748,9 +773,9 @@ let_isDown = false;
     width: 100%;
     height: 100%;
   }
-    #gift-gallery-grid .closet-item {
-    width: 4.8em;
-    height: 4.8em;
+    #gift-gallery-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3px; 
   }
 }
   </style>
@@ -910,7 +935,7 @@ let_isDown = false;
   
   <!-- Gift Gallery Modal -->
   <div id="gift-gallery-modal" class="modal">
-    <div class="modal-content" style="max-width:90%;">
+    <div class="modal-content" style="max-width:100%;">
       <span class="close" id="gift-gallery-close">&times;</span>
       <h2>Unlocked Gifts Gallery</h2>
       <div id="gift-gallery-grid" class="closet-grid"></div>
@@ -931,7 +956,7 @@ let_isDown = false;
     }
     
     // Gift req & images
-    const giftRequirement = 3;
+    const giftRequirement = 1;
     const basePath = "Pictures/";
     let giftImages = Array.from({ length: 150 }, (_, i) => `${basePath}${i + 1}.jpg`);
     
@@ -1162,7 +1187,7 @@ let_isDown = false;
     
     // Gift Reset using custom modal
     giftResetBtn.addEventListener('click', () => {
-      showConfirmation("Are you sure you want to reset all unlocked gifts?", (confirmed) => {
+      showConfirmation("Reset gifts?", (confirmed) => {
         if (confirmed) {
           unlockedGifts = [];
           saveData();
@@ -1174,7 +1199,7 @@ let_isDown = false;
     
     // Factory Reset using custom modal
     factoryResetBtn.addEventListener('click', () => {
-      showConfirmation("Are you sure you want to factory reset? This will clear all game data.", (confirmed) => {
+      showConfirmation("Factory reset?", (confirmed) => {
         if (confirmed) {
           localStorage.clear();
           location.reload();
@@ -1647,6 +1672,7 @@ let_isDown = false;
             el.style.color = 'white';
         }
       });
+      rightStreak = 0; 
       lives--;
       updateLives();
       nextBtn.disabled = false;
